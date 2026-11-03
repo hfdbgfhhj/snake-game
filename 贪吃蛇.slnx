@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="贪吃蛇.vcxproj" Id="99e2f335-e60d-4b25-8c5e-691240685178" />
+</Solution>
