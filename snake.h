@@ -3,6 +3,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include<iostream>
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
@@ -18,25 +19,28 @@
 #define KEY_RIGHT 77
 #define KEY_ESC 27
 
-//单个蛇身or食物位置
+//食物位置
 typedef struct {
 	int X;
 	int Y;
-}Point;
-
-
-//蛇的结构体
-typedef struct {
-	Point Body[WIDE*HIGH];
-	int size;
-	int dir;
-}Snake;
-
-//食物的结构体
-typedef struct {
-	Point pos;
 }Food;
 
+
+//蛇身
+typedef struct SnakeNode {
+	int X;
+	int Y;
+	struct SnakeNode* next;
+	struct SnakeNode* last;
+}Node;
+
+//蛇管理(储存数据）
+typedef struct {
+	int size;
+	int dir;
+	Node* head;
+	Node* tail;
+}Snake;
 //初始化
 void InitGame();//游戏总体初始化
 void InitSnake();//蛇初始化

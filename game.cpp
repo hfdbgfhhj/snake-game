@@ -16,28 +16,45 @@ void HideCursor() {
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
 }
 
+
+
 void InitSnake() {
 	snake.size = 3;
 	snake.dir = KEY_RIGHT;
-	snake.Body[0].X = WIDE / 2;
-	snake.Body[0].Y = HIGH / 2;
-	snake.Body[1].X = WIDE / 2 - 1;
-	snake.Body[1].Y = HIGH / 2;
-	snake.Body[2].X = WIDE / 2 - 2;
-	snake.Body[2].Y = HIGH / 2;
+
+	snake.head = new Node;
+	snake.head->X = WIDE / 2;
+	snake.head->Y = HIGH / 2;
+	snake.head->next = NULL;
+	snake.head->last = NULL;
+
+	Node* p = snake.head;
+	snake.tail = snake.head;
+	for (int i = 1;i < snake.size;i++) {
+		Node* newnode = new Node;
+		newnode->Y = HIGH / 2;
+		newnode->X = WIDE / 2 - i;
+		newnode->last = p;
+		p->next = newnode;
+		newnode->next = NULL;
+		snake.tail = newnode;
+		p = p->next;
+	}
 }
 
 void InitFood() {
 	int judge;
 	do {
 		judge = 0;
-		food.pos.X = rand() % (WIDE - 2) + 1;
-		food.pos.Y = rand() % (HIGH - 2) + 1;
-		for (int i = 0;i < snake.size;i++) {
-			if (food.pos.X == snake.Body[i].X && food.pos.Y == snake.Body[i].Y) {
+		food.X = rand() % (WIDE - 2) + 1;
+		food.Y = rand() % (HIGH - 2) + 1;
+		Node* p = snake.head;
+		while(p!=NULL) {
+			if (food.X == p->X && food.Y == p->Y) {
 				judge = 1;
 				break;
 			}
+			p = p->next;
 		}
 	} while (judge);
 }
@@ -62,39 +79,43 @@ void DrawMap() {
 }
 
 void DrawSnake() {
-	Gotoxy(snake.Body[0].X, snake.Body[0].Y);
+	Gotoxy(snake.head->X, snake.head->Y);
 	printf("@");
-	for (int i = 1;i < snake.size;i++) {
-		Gotoxy(snake.Body[i].X, snake.Body[i].Y);
+	Node* p = snake.head->next;
+	while(p!=NULL) {
+		Gotoxy(p->X,p->Y);
 		printf("*");
+		p = p->next;
 	}
 }
 
 void DrawFood() {
-	Gotoxy(food.pos.X, food.pos.Y);
+	Gotoxy(food.X, food.Y);
 	printf("$");
 }
 
 void MoveSnake() {
-	Gotoxy(snake.Body[snake.size - 1].X, snake.Body[snake.size - 1].Y);
-	printf(" ");
-	for (int i = snake.size - 1;i > 0;i--) {
-		snake.Body[i] = snake.Body[i - 1];
-	}
+	Node* p = new Node;
+	p->X = snake.head->X;
+	p->Y = snake.head->Y;
 	switch (snake.dir) {
-	case KEY_UP: snake.Body[0].Y--;
+	case KEY_UP: p->Y--;
 		break;
-	case KEY_DOWN: snake.Body[0].Y++;
+	case KEY_DOWN: p->Y++;
 		break;
-	case KEY_LEFT: snake.Body[0].X--;
+	case KEY_LEFT: p->X--;
 		break;
-	case KEY_RIGHT: snake.Body[0].X++;
+	case KEY_RIGHT: p->X++;
 		break;
 	}
+	p->next = snake.head;
+	p->last = NULL;
+	snake.head->last = p;
+	snake.head = p;
 }
 
 void CheckEat() {
-	if (snake.Body[0].X == food.pos.X && snake.Body[0].Y == food.pos.Y) {
+	if (snake.head->X == food.X && snake.head->Y == food.Y) {
 		snake.size++;
 		score += 10;
 		InitFood();
@@ -102,22 +123,38 @@ void CheckEat() {
 		Gotoxy(0, HIGH);
 		printf("Score:%d", score);
 	}
-
-}
-
-void CheckCollision() {
-	if (snake.Body[0].X <= 0 || snake.Body[0].X >= WIDE - 1 || snake.Body[0].Y <= 0 || snake.Body[0].Y >= HIGH - 1) {
-		Gotoxy(WIDE / 2 - 5, HIGH / 2);
-		printf("GAME OVER");
-		Sleep(3000);
-		exit(0);
+	else {
+		Gotoxy(snake.tail->X, snake.tail->Y);
+		printf(" ");
+		Node* p = snake.tail;
+		snake.tail = snake.tail->last;
+		snake.tail->next = NULL;
+		delete p;
 	}
-	for (int i = 1;i < snake.size;i++) {
-		if (snake.Body[i].X == snake.Body[0].X && snake.Body[i].Y == snake.Body[0].Y) {
-			Gotoxy(WIDE / 2 - 5, HIGH / 2);
-			printf("GAME OVER");
-			Sleep(3000);
-			exit(0);
+}
+void gameover() {
+	Gotoxy(WIDE / 2 - 5, HIGH / 2);
+	printf("GAME OVER");
+	Sleep(3000);
+	Node* p = snake.head;
+	while (p != NULL) {
+		Node* temp = p->next;
+		delete p;
+		p = temp;
+	}
+	snake.head = NULL;
+	snake.tail = NULL;
+	exit(0);
+}
+void CheckCollision() {
+	if (snake.head->X <= 0 || snake.head->X >= WIDE - 1 || snake.head->Y <= 0 || snake.head->Y >= HIGH - 1) {
+		gameover();
+	}
+	Node* p = snake.head->next;
+	while(p!=NULL) {
+		if (snake.head->X == p->X && snake.head->Y ==p->Y) {
+			gameover();
 		}
+		p = p->next;
 	}
 }
