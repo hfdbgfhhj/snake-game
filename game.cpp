@@ -1,43 +1,38 @@
 #include"snake.h"
 
-Snake snake;
+void InitImage() {
+	loadimage(&img_body1, _T("images/body1.png"), 30, 30);
+	loadimage(&img_head1, _T("images/head1.png"), 30, 30);
+	loadimage(&img_food, _T("images/food.png"), 30, 30);
+}
+
+IMAGE img_body1;
+IMAGE img_head1;
+IMAGE img_food;
+Snake snake1;
 Food food;
 int score;
 
-void Gotoxy(int x, int y) {
-	COORD pos = {
-		(SHORT)x,(SHORT)y
-	};
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(hOut, pos);
-}
-void HideCursor() {
-	CONSOLE_CURSOR_INFO cursor_info = { 1,0 };
-	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
-}
-
-
-
 void InitSnake() {
-	snake.size = 3;
-	snake.dir = KEY_RIGHT;
+	snake1.size = 3;
+	snake1.dir = KEY_RIGHT;
 
-	snake.head = new Node;
-	snake.head->X = WIDE / 2;
-	snake.head->Y = HIGH / 2;
-	snake.head->next = NULL;
-	snake.head->last = NULL;
+	snake1.head = new Node;
+	snake1.head->X = WIDE / 2;
+	snake1.head->Y = HIGH / 2;
+	snake1.head->next = NULL;
+	snake1.head->last = NULL;
 
-	Node* p = snake.head;
-	snake.tail = snake.head;
-	for (int i = 1;i < snake.size;i++) {
+	Node* p = snake1.head;
+	snake1.tail = snake1.head;
+	for (int i = 1;i < snake1.size;i++) {
 		Node* newnode = new Node;
 		newnode->Y = HIGH / 2;
 		newnode->X = WIDE / 2 - i;
 		newnode->last = p;
 		p->next = newnode;
 		newnode->next = NULL;
-		snake.tail = newnode;
+		snake1.tail = newnode;
 		p = p->next;
 	}
 }
@@ -46,9 +41,9 @@ void InitFood() {
 	int judge;
 	do {
 		judge = 0;
-		food.X = rand() % (WIDE - 2) + 1;
-		food.Y = rand() % (HIGH - 2) + 1;
-		Node* p = snake.head;
+		food.X = rand() % (WIDE - 1);
+		food.Y = rand() % (HIGH - 1);
+		Node* p = snake1.head;
 		while(p!=NULL) {
 			if (food.X == p->X && food.Y == p->Y) {
 				judge = 1;
@@ -63,42 +58,55 @@ void InitGame() {
 	InitSnake();
 	InitFood();
 	score = 0;
-	HideCursor();
 }
 
 void DrawMap() {
-	for (int i = 0;i < HIGH;i++) {
-		for (int j = 0;j < WIDE;j++) {
-			if (i == 0 || i == HIGH - 1 || j == 0 || j == WIDE - 1) printf("#");
-			else printf(" ");
-		}
-		printf("\n");
+	setfillcolor(RGB(40, 40, 40));
+	solidrectangle(0, 0, WIDE * 30,HIGH * 30);
+	setlinecolor(RGB(80, 80, 80));
+	for (int i = 0;i <=HIGH * 30;i += 30) {
+		line(0, i , WIDE * 30, i );
 	}
-	Gotoxy(0, HIGH);
-	printf("Score:%d", score);
+	for (int j = 0;j <= WIDE * 30;j += 30) {
+		line(j , 0, j , HIGH * 30);
+	}
+	setlinecolor(RGB(255, 255, 255));
+	rectangle(0, 0, WIDE * 30, HIGH * 30);
+	TCHAR buf[64];
+	_stprintf_s(buf,_T("score:%d"), score);
+	settextcolor(RGB(255, 0, 0));
+	settextstyle(24, 0,_T("Consolas"));
+	outtextxy(WIDE * 30-200, 5, buf);
 }
 
 void DrawSnake() {
-	Gotoxy(snake.head->X, snake.head->Y);
-	printf("@");
-	Node* p = snake.head->next;
-	while(p!=NULL) {
-		Gotoxy(p->X,p->Y);
-		printf("*");
+	Node* p = snake1.head;
+	bool isHead = true;
+	while (p != NULL) {
+		int px = p->X*30;
+		int py = p->Y*30;
+		if (isHead) {
+			putimage(px, py, &img_head1);
+			isHead = false;
+		}
+		else {
+			putimage(px, py, &img_body1);
+		}
 		p = p->next;
 	}
 }
 
 void DrawFood() {
-	Gotoxy(food.X, food.Y);
-	printf("$");
+	int px = food.X*30;
+	int py = food.Y*30;
+	putimage(px, py, &img_food);
 }
 
 void MoveSnake() {
 	Node* p = new Node;
-	p->X = snake.head->X;
-	p->Y = snake.head->Y;
-	switch (snake.dir) {
+	p->X = snake1.head->X;
+	p->Y = snake1.head->Y;
+	switch (snake1.dir) {
 	case KEY_UP: p->Y--;
 		break;
 	case KEY_DOWN: p->Y++;
@@ -108,51 +116,47 @@ void MoveSnake() {
 	case KEY_RIGHT: p->X++;
 		break;
 	}
-	p->next = snake.head;
+	p->next = snake1.head;
 	p->last = NULL;
-	snake.head->last = p;
-	snake.head = p;
+	snake1.head->last = p;
+	snake1.head = p;
 }
 
 void CheckEat() {
-	if (snake.head->X == food.X && snake.head->Y == food.Y) {
-		snake.size++;
+	if (snake1.head->X == food.X && snake1.head->Y == food.Y) {
+		snake1.size++;
 		score += 10;
 		InitFood();
-		DrawFood();
-		Gotoxy(0, HIGH);
-		printf("Score:%d", score);
 	}
 	else {
-		Gotoxy(snake.tail->X, snake.tail->Y);
-		printf(" ");
-		Node* p = snake.tail;
-		snake.tail = snake.tail->last;
-		snake.tail->next = NULL;
+		Node* p = snake1.tail;
+		snake1.tail = snake1.tail->last;
+		snake1.tail->next = NULL;
 		delete p;
 	}
 }
 void gameover() {
-	Gotoxy(WIDE / 2 - 5, HIGH / 2);
-	printf("GAME OVER");
+	settextcolor(RGB(255, 0, 0));
+	settextstyle(60, 0, _T("Consolas"));
+	outtextxy(WIDE * 15 - 150, HIGH * 15 - 30, _T("GAME OVER"));
 	Sleep(3000);
-	Node* p = snake.head;
+	Node* p = snake1.head;
 	while (p != NULL) {
 		Node* temp = p->next;
 		delete p;
 		p = temp;
 	}
-	snake.head = NULL;
-	snake.tail = NULL;
+	snake1.head = NULL;
+	snake1.tail = NULL;
 	exit(0);
 }
 void CheckCollision() {
-	if (snake.head->X <= 0 || snake.head->X >= WIDE - 1 || snake.head->Y <= 0 || snake.head->Y >= HIGH - 1) {
+	if (snake1.head->X < 0 || snake1.head->X > WIDE - 1 || snake1.head->Y < 0 || snake1.head->Y > HIGH - 1) {
 		gameover();
 	}
-	Node* p = snake.head->next;
+	Node* p = snake1.head->next;
 	while(p!=NULL) {
-		if (snake.head->X == p->X && snake.head->Y ==p->Y) {
+		if (snake1.head->X == p->X && snake1.head->Y ==p->Y) {
 			gameover();
 		}
 		p = p->next;

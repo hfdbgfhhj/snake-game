@@ -9,9 +9,15 @@
 #include<time.h>
 #include<conio.h>
 #include<windows.h>
+#include<graphics.h>
+#include<tchar.h>
 
-#define WIDE 60
-#define HIGH 20
+extern IMAGE img_body1;
+extern IMAGE img_head1;
+extern IMAGE img_food;
+
+#define WIDE 50
+#define HIGH 30
 
 #define KEY_UP 72
 #define KEY_DOWN 80
@@ -45,18 +51,18 @@ typedef struct {
 void InitGame();//游戏总体初始化
 void InitSnake();//蛇初始化
 void InitFood();//食物初始化
+void InitImage();//图片初始化
 //渲染
 void DrawSnake();//画蛇
 void DrawFood();//画食物
 void DrawMap();//画地图
-void DrawUI();//画界面
 //逻辑运行
 void MoveSnake();
 void CheckEat();
 void CheckCollision();//检查撞墙，撞自己
 
 //声明变量
-extern Snake snake;
+extern Snake snake1;
 extern Food food;
 extern int score;
 

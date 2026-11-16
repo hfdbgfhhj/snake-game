@@ -1,27 +1,43 @@
 #include"snake.h"
 int main() {
 	srand((unsigned)time(NULL));
+	initgraph(WIDE * 30, HIGH * 30);
+
+	InitImage();
 	InitGame();
+
+	BeginBatchDraw();
+
+	ExMessage msg;
+
 	DrawMap();
 	DrawFood();
 	DrawSnake();
 	while (1) {
-		if (_kbhit()) {
-			int key = _getch();
-			if (key == 224) {
-				key = _getch();
-				if (key == KEY_UP && snake.dir != KEY_DOWN) snake.dir = KEY_UP;
-				if (key == KEY_DOWN && snake.dir != KEY_UP) snake.dir = KEY_DOWN;
-				if (key == KEY_LEFT && snake.dir != KEY_RIGHT) snake.dir = KEY_LEFT;
-				if (key == KEY_RIGHT && snake.dir != KEY_LEFT) snake.dir = KEY_RIGHT;
+		while (peekmessage(&msg,EM_KEY)){
+			if (msg.message==WM_KEYDOWN) {
+				switch (msg.vkcode) {
+				case VK_UP:    if (snake1.dir != KEY_DOWN)  snake1.dir = KEY_UP;    break;
+				case VK_DOWN:  if (snake1.dir != KEY_UP)    snake1.dir = KEY_DOWN;  break;
+				case VK_LEFT:  if (snake1.dir != KEY_RIGHT) snake1.dir = KEY_LEFT;  break;
+				case VK_RIGHT: if (snake1.dir != KEY_LEFT)  snake1.dir = KEY_RIGHT; break;
+				case VK_ESCAPE:
+					EndBatchDraw();
+					closegraph();
+					return 0;
+				}
 			}
-			if (key == KEY_ESC) break;
 		}
 		MoveSnake();
 		CheckEat();
 		CheckCollision();
+		DrawMap();
+		DrawFood();
 		DrawSnake();
+		FlushBatchDraw();
 		Sleep(150);
 	}
+	EndBatchDraw();
+	closegraph();
 	return 0;
 }
