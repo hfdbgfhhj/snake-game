@@ -71,5 +71,4 @@ extern Snake snake1;
 extern int score;
 extern int map[WIDE][HIGH];
 extern Food foods[MAX_FOOD];
-
 #endif
