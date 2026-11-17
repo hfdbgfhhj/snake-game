@@ -22,6 +22,7 @@ int main() {
 				case VK_LEFT:  if (snake1.dir != KEY_RIGHT) snake1.dir = KEY_LEFT;  break;
 				case VK_RIGHT: if (snake1.dir != KEY_LEFT)  snake1.dir = KEY_RIGHT; break;
 				case VK_ESCAPE:
+					gameover();
 					EndBatchDraw();
 					closegraph();
 					return 0;
@@ -35,7 +36,7 @@ int main() {
 		DrawFood();
 		DrawSnake();
 		FlushBatchDraw();
-		Sleep(150);
+		Sleep(200);
 	}
 	EndBatchDraw();
 	closegraph();

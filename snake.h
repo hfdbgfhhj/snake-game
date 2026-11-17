@@ -24,6 +24,7 @@ extern IMAGE img_food;
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 #define KEY_ESC 27
+#define MAX_FOOD 3
 
 //食物位置
 typedef struct {
@@ -60,10 +61,15 @@ void DrawMap();//画地图
 void MoveSnake();
 void CheckEat();
 void CheckCollision();//检查撞墙，撞自己
+void gameover();
+
+//更新地图状态，判断食物生成是否合法
+void Updatemap();
 
 //声明变量
 extern Snake snake1;
-extern Food food;
 extern int score;
+extern int map[WIDE][HIGH];
+extern Food foods[MAX_FOOD];
 
 #endif

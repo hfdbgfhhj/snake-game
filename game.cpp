@@ -10,15 +10,16 @@ IMAGE img_body1;
 IMAGE img_head1;
 IMAGE img_food;
 Snake snake1;
-Food food;
 int score;
+int map[WIDE][HIGH] = { 0 };
+Food foods[MAX_FOOD];
 
 void InitSnake() {
 	snake1.size = 3;
 	snake1.dir = KEY_RIGHT;
 
 	snake1.head = new Node;
-	snake1.head->X = WIDE / 2;
+	snake1.head->X = WIDE / 4;
 	snake1.head->Y = HIGH / 2;
 	snake1.head->next = NULL;
 	snake1.head->last = NULL;
@@ -28,7 +29,7 @@ void InitSnake() {
 	for (int i = 1;i < snake1.size;i++) {
 		Node* newnode = new Node;
 		newnode->Y = HIGH / 2;
-		newnode->X = WIDE / 2 - i;
+		newnode->X = WIDE / 4 - i;
 		newnode->last = p;
 		p->next = newnode;
 		newnode->next = NULL;
@@ -37,21 +38,43 @@ void InitSnake() {
 	}
 }
 
+void Updatemap() {
+	Node* p = snake1.head;
+	while (p != NULL) {
+		int dx = p->X;
+		int dy = p->Y;
+		map[dx][dy] = 1;
+		p = p->next;
+	}
+	delete p;
+	for (int i = 0;i < MAX_FOOD;i++) {
+		int dx = foods[i].X;
+		int dy = foods[i].Y;
+		map[dx][dy] = 1;
+	}
+}
+
 void InitFood() {
-	int judge;
-	do {
-		judge = 0;
-		food.X = rand() % (WIDE - 1);
-		food.Y = rand() % (HIGH - 1);
-		Node* p = snake1.head;
-		while(p!=NULL) {
-			if (food.X == p->X && food.Y == p->Y) {
-				judge = 1;
-				break;
+	Updatemap();
+	for (int i = 0;i < MAX_FOOD;i++) {
+		int count = 0;
+		int EmptyX[WIDE] = { 0 };
+		int EmptyY[HIGH] = { 0 };
+		for (int x = 0;x < WIDE;x++) {
+			for (int y = 0;y < HIGH;y++) {
+				if (map[x][y] == 0) {
+					EmptyX[count] = x;
+					EmptyY[count] = y;
+					count++;
+				}
 			}
-			p = p->next;
 		}
-	} while (judge);
+		int j = rand() % (count - 1);
+		foods[i].X = EmptyX[j];
+		foods[i].Y = EmptyY[j];
+		map[foods[i].X][foods[i].Y] = 1;
+	}
+
 }
 
 void InitGame() {
@@ -76,7 +99,7 @@ void DrawMap() {
 	_stprintf_s(buf,_T("score:%d"), score);
 	settextcolor(RGB(255, 0, 0));
 	settextstyle(24, 0,_T("Consolas"));
-	outtextxy(WIDE * 30-200, 5, buf);
+	outtextxy(90, 5, buf);
 }
 
 void DrawSnake() {
@@ -139,6 +162,7 @@ void gameover() {
 	settextcolor(RGB(255, 0, 0));
 	settextstyle(60, 0, _T("Consolas"));
 	outtextxy(WIDE * 15 - 150, HIGH * 15 - 30, _T("GAME OVER"));
+	FlushBatchDraw();
 	Sleep(3000);
 	Node* p = snake1.head;
 	while (p != NULL) {
