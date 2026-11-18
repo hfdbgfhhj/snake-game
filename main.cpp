@@ -17,14 +17,14 @@ int main() {
 		while (peekmessage(&msg,EM_KEY)){
 			if (msg.message==WM_KEYDOWN) {
 				switch (msg.vkcode) {
-				case VK_UP:    if (snake1.dir != VK_DOWN)  snake1.dir = VK_UP;    break;
-				case VK_DOWN:  if (snake1.dir != VK_UP)    snake1.dir = VK_DOWN;  break;
-				case VK_LEFT:  if (snake1.dir != VK_RIGHT) snake1.dir = VK_LEFT;  break;
-				case VK_RIGHT: if (snake1.dir != VK_LEFT)  snake1.dir = VK_RIGHT; break;
-				case 'W':    if (snake2.dir != VK_DOWN)  snake2.dir = VK_UP;    break;
-				case 'S':  if (snake2.dir != VK_UP)    snake2.dir = VK_DOWN;  break;
-				case 'A':  if (snake2.dir != VK_RIGHT) snake2.dir = VK_LEFT;  break;
-				case 'D': if (snake2.dir != VK_LEFT)  snake2.dir = VK_RIGHT; break;
+				case VK_UP:    if (snake2.dir != VK_DOWN)  snake2.dir = VK_UP;    break;
+				case VK_DOWN:  if (snake2.dir != VK_UP)    snake2.dir = VK_DOWN;  break;
+				case VK_LEFT:  if (snake2.dir != VK_RIGHT) snake2.dir = VK_LEFT;  break;
+				case VK_RIGHT: if (snake2.dir != VK_LEFT)  snake2.dir = VK_RIGHT; break;
+				case 'W':    if (snake1.dir != VK_DOWN)  snake1.dir = VK_UP;    break;
+				case 'S':  if (snake1.dir != VK_UP)    snake1.dir = VK_DOWN;  break;
+				case 'A':  if (snake1.dir != VK_RIGHT) snake1.dir = VK_LEFT;  break;
+				case 'D': if (snake1.dir != VK_LEFT)  snake1.dir = VK_RIGHT; break;
 				case VK_ESCAPE:
 					gameover();
 					EndBatchDraw();
