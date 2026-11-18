@@ -142,7 +142,8 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="game.cpp" />
+    <ClCompile Include="game1.cpp" />
+    <ClCompile Include="game2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="snake.h" />
   </ItemGroup>

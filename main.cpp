@@ -16,7 +16,6 @@ int main() {
 	while (1) {
 		while (peekmessage(&msg,EM_KEY)){
 			if (msg.message==WM_KEYDOWN) {
-				// msg.vkcode 是 VK 码，这里转换成游戏内部的方向常量 KEY_*
 				switch (msg.vkcode) {
 				case VK_UP:    if (snake1.dir != KEY_DOWN)  snake1.dir = KEY_UP;    break;
 				case VK_DOWN:  if (snake1.dir != KEY_UP)    snake1.dir = KEY_DOWN;  break;

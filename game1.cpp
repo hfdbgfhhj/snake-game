@@ -4,17 +4,23 @@ void InitImage() {
 	loadimage(&img_body1, _T("images/body1.png"), 30, 30);
 	loadimage(&img_head1, _T("images/head1.png"), 30, 30);
 	loadimage(&img_food, _T("images/food.png"), 30, 30);
+	loadimage(&img_body2, _T("images/body2.png"), 30, 30);
+	loadimage(&img_head2, _T("images/head2.png"), 30, 30);
 }
 
 IMAGE img_body1;
 IMAGE img_head1;
 IMAGE img_food;
+IMAGE img_head2;
+IMAGE img_body2;
 Snake snake1;
-int score;
+Snake snake2;
+int score1;
+int score2;
 int map[WIDE][HIGH] = { 0 };
 Food foods[MAX_FOOD];
 
-void InitSnake() {
+void InitSnake1() {
 	snake1.size = 3;
 	snake1.dir = KEY_RIGHT;
 
@@ -82,10 +88,11 @@ void InitFood() {
 }
 
 void InitGame() {
-	InitSnake();
+	InitSnake1();
+	InitSnake2();
 	Updatemap();
 	InitFood();
-	score = 0;
+	score1 = 0;
 }
 
 void DrawMap() {
@@ -101,7 +108,7 @@ void DrawMap() {
 	setlinecolor(RGB(255, 255, 255));
 	rectangle(0, 0, WIDE * 30, HIGH * 30);
 	TCHAR buf[64];
-	_stprintf_s(buf,_T("score:%d"), score);
+	_stprintf_s(buf,_T("score:%d"), score1);
 	settextcolor(RGB(255, 0, 0));
 	settextstyle(24, 0,_T("Consolas"));
 	outtextxy(90, 5, buf);
@@ -163,7 +170,7 @@ void CheckEat() {
 	map[dx][dy] = 1;			// 新头占位
 
 	if (cell == 2) {			// 吃到食物：不删尾巴，蛇变长
-		score += 10;
+		score1 += 10;
 		snake1.size++;
 		for (int i = 0;i < MAX_FOOD;i++) {
 			if (foods[i].X == dx && foods[i].Y == dy) {	// 只补充被吃掉的那一个

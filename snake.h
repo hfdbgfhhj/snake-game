@@ -14,6 +14,8 @@
 
 extern IMAGE img_body1;
 extern IMAGE img_head1;
+extern IMAGE img_head2;
+extern IMAGE img_body2;
 extern IMAGE img_food;
 
 #define WIDE 50
@@ -24,6 +26,7 @@ extern IMAGE img_food;
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 #define KEY_ESC 27
+
 #define MAX_FOOD 3
 
 //食物位置
@@ -50,7 +53,8 @@ typedef struct {
 }Snake;
 //初始化
 void InitGame();//游戏总体初始化
-void InitSnake();//蛇初始化
+void InitSnake1();//蛇初始化
+void InitSnake2();
 void InitFood();//食物初始化
 void InitImage();//图片初始化
 //渲染
@@ -68,7 +72,9 @@ void Updatemap();
 
 //声明变量
 extern Snake snake1;
-extern int score;
+extern Snake snake2;
+extern int score1;
+extern int score2;
 extern int map[WIDE][HIGH];
 extern Food foods[MAX_FOOD];
 #endif
