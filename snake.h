@@ -21,12 +21,6 @@ extern IMAGE img_food;
 #define WIDE 50
 #define HIGH 30
 
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
-#define KEY_ESC 27
-
 #define MAX_FOOD 3
 
 //食物位置
@@ -58,11 +52,13 @@ void InitSnake2();
 void InitFood();//食物初始化
 void InitImage();//图片初始化
 //渲染
-void DrawSnake();//画蛇
+void DrawSnake1();//画蛇
+void DrawSnake2();
 void DrawFood();//画食物
 void DrawMap();//画地图
 //逻辑运行
-void MoveSnake();
+void MoveSnake1();
+void MoveSnake2();
 void CheckEat();
 void CheckCollision();//检查撞墙，撞自己
 void gameover();

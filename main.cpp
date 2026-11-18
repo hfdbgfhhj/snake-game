@@ -12,15 +12,19 @@ int main() {
 
 	DrawMap();
 	DrawFood();
-	DrawSnake();
+	DrawSnake1();
 	while (1) {
 		while (peekmessage(&msg,EM_KEY)){
 			if (msg.message==WM_KEYDOWN) {
 				switch (msg.vkcode) {
-				case VK_UP:    if (snake1.dir != KEY_DOWN)  snake1.dir = KEY_UP;    break;
-				case VK_DOWN:  if (snake1.dir != KEY_UP)    snake1.dir = KEY_DOWN;  break;
-				case VK_LEFT:  if (snake1.dir != KEY_RIGHT) snake1.dir = KEY_LEFT;  break;
-				case VK_RIGHT: if (snake1.dir != KEY_LEFT)  snake1.dir = KEY_RIGHT; break;
+				case VK_UP:    if (snake1.dir != VK_DOWN)  snake1.dir = VK_UP;    break;
+				case VK_DOWN:  if (snake1.dir != VK_UP)    snake1.dir = VK_DOWN;  break;
+				case VK_LEFT:  if (snake1.dir != VK_RIGHT) snake1.dir = VK_LEFT;  break;
+				case VK_RIGHT: if (snake1.dir != VK_LEFT)  snake1.dir = VK_RIGHT; break;
+				case 'W':    if (snake2.dir != VK_DOWN)  snake2.dir = VK_UP;    break;
+				case 'S':  if (snake2.dir != VK_UP)    snake2.dir = VK_DOWN;  break;
+				case 'A':  if (snake2.dir != VK_RIGHT) snake2.dir = VK_LEFT;  break;
+				case 'D': if (snake2.dir != VK_LEFT)  snake2.dir = VK_RIGHT; break;
 				case VK_ESCAPE:
 					gameover();
 					EndBatchDraw();
@@ -29,12 +33,14 @@ int main() {
 				}
 			}
 		}
-		MoveSnake();
+		MoveSnake1();
+		MoveSnake2();
 		CheckEat();
 		CheckCollision();
 		DrawMap();
 		DrawFood();
-		DrawSnake();
+		DrawSnake1();
+		DrawSnake2();
 		FlushBatchDraw();
 		Sleep(200);
 	}

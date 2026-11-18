@@ -22,7 +22,7 @@ Food foods[MAX_FOOD];
 
 void InitSnake1() {
 	snake1.size = 3;
-	snake1.dir = KEY_RIGHT;
+	snake1.dir = VK_RIGHT;
 
 	snake1.head = new Node;
 	snake1.head->X = WIDE / 4;
@@ -74,6 +74,9 @@ void Updatemap() {
 	for (Node* p = snake1.head; p != NULL; p = p->next) {
 		map[p->X][p->Y] = 1;
 	}
+	for (Node* p = snake2.head;p != NULL;p = p->next) {
+		map[p->X][p->Y] = 1;
+	}
 }
 
 // 一次生成 MAX_FOOD 个食物
@@ -107,14 +110,19 @@ void DrawMap() {
 	}
 	setlinecolor(RGB(255, 255, 255));
 	rectangle(0, 0, WIDE * 30, HIGH * 30);
-	TCHAR buf[64];
-	_stprintf_s(buf,_T("score:%d"), score1);
+	TCHAR buf1[64];
+	_stprintf_s(buf1,_T("score1:%d"), score1);
 	settextcolor(RGB(255, 0, 0));
 	settextstyle(24, 0,_T("Consolas"));
-	outtextxy(90, 5, buf);
+	outtextxy(90, 5, buf1);
+	TCHAR buf2[64];
+	_stprintf_s(buf2, _T("score2: % d"), score2);
+	settextcolor(RGB(255, 0, 0));
+	settextstyle(24, 0, _T("Consolas"));
+	outtextxy(WIDE*30-200, 5, buf2);
 }
 
-void DrawSnake() {
+void DrawSnake1() {
 	Node* p = snake1.head;
 	bool isHead = true;
 	while (p != NULL) {
@@ -139,18 +147,18 @@ void DrawFood() {
 	}
 }
 
-void MoveSnake() {
+void MoveSnake1() {
 	Node* p = new Node;
 	p->X = snake1.head->X;
 	p->Y = snake1.head->Y;
 	switch (snake1.dir) {
-	case KEY_UP: p->Y--;
+	case VK_UP: p->Y--;
 		break;
-	case KEY_DOWN: p->Y++;
+	case VK_DOWN: p->Y++;
 		break;
-	case KEY_LEFT: p->X--;
+	case VK_LEFT: p->X--;
 		break;
-	case KEY_RIGHT: p->X++;
+	case VK_RIGHT: p->X++;
 		break;
 	}
 	p->next = snake1.head;
@@ -164,14 +172,13 @@ void MoveSnake() {
 void CheckEat() {
 	int dx = snake1.head->X;
 	int dy = snake1.head->Y;
-	if (dx < 0 || dx >= WIDE || dy < 0 || dy >= HIGH) return;	// 出界交给 CheckCollision
 
 	int cell = map[dx][dy];
 	map[dx][dy] = 1;			// 新头占位
 
 	if (cell == 2) {			// 吃到食物：不删尾巴，蛇变长
 		score1 += 10;
-		snake1.size++;
+		//snake1.size++;
 		for (int i = 0;i < MAX_FOOD;i++) {
 			if (foods[i].X == dx && foods[i].Y == dy) {	// 只补充被吃掉的那一个
 				if (RandomEmptyCell(&foods[i].X, &foods[i].Y)) {
@@ -187,12 +194,37 @@ void CheckEat() {
 	}
 	else {						// 没吃到：删尾巴
 		map[snake1.tail->X][snake1.tail->Y] = 0;
-		if (snake1.tail->last != NULL) {
 			Node* p = snake1.tail;
 			snake1.tail = snake1.tail->last;
 			snake1.tail->next = NULL;
 			delete p;
+	}
+	dx = snake2.head->X;
+	dy = snake2.head->Y;
+	cell = map[dx][dy];
+	map[dx][dy] = 1;
+	if (cell == 2) {
+		score2 += 10;
+		for (int i = 0;i < MAX_FOOD;i++) {
+			if (dx == foods[i].X && dy == foods[i].Y) {
+				if (RandomEmptyCell(&foods[i].X, &foods[i].Y)) {
+					map[foods[i].X][foods[i].Y] = 2;
+				}
+				else {
+					foods[i].X = -1;
+					foods[i].Y = -1;
+				}
+				break;
+			}
 		}
+	}
+	else {
+		map[snake2.tail->X][snake2.tail->Y] = 0;
+		map[dx][dy] = 1;
+		Node* p = snake2.tail;
+		snake2.tail = snake2.tail->last;
+		snake2.tail->next = NULL;
+		delete p;
 	}
 }
 void gameover() {
@@ -209,10 +241,21 @@ void gameover() {
 	}
 	snake1.head = NULL;
 	snake1.tail = NULL;
+	Node* q = snake2.head;
+	while (q != NULL) {
+		Node* temp = q->next;
+		delete q;
+		q = temp;
+	}
+	snake2.head = NULL;
+	snake2.tail = NULL;
 	exit(0);
 }
 void CheckCollision() {
 	if (snake1.head->X < 0 || snake1.head->X > WIDE - 1 || snake1.head->Y < 0 || snake1.head->Y > HIGH - 1) {
+		gameover();
+	}
+	if (snake2.head->X < 0 || snake2.head->X > WIDE - 1 || snake2.head->Y < 0 || snake2.head->Y > HIGH - 1) {
 		gameover();
 	}
 	Node* p = snake1.head->next;
@@ -221,5 +264,12 @@ void CheckCollision() {
 			gameover();
 		}
 		p = p->next;
+	}
+	Node* q = snake2.head->next;
+	while (q != NULL) {
+		if (snake2.head->X == q->X && snake2.head->Y == q->Y) {
+			gameover();
+		}
+		q = q->next;
 	}
 }
