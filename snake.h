@@ -71,8 +71,8 @@ void gameover();
 void Updatemap();
 
 //声明变量
-extern Snake snake2;
 extern Snake snake1;
+extern Snake snake2;
 extern int score1;
 extern int score2;
 extern int map[WIDE][HIGH];

@@ -13,25 +13,25 @@ IMAGE img_head1;
 IMAGE img_food;
 IMAGE img_head2;
 IMAGE img_body2[MAX_IMAGE];
-Snake snake2;
 Snake snake1;
+Snake snake2;
 int score1;
 int score2;
 int map[WIDE][HIGH] = { 0 };
 Food foods[MAX_FOOD];
 
 void InitSnake1() {
-	snake2.size = 3;
-	snake2.dir = VK_RIGHT;
-	snake2.head = new Node;
-	snake2.head->X = WIDE / 4;
-	snake2.head->Y = HIGH / 2;
-	snake2.head->next = NULL;
-	snake2.head->last = NULL;
+	snake1.size = 3;
+	snake1.dir = VK_RIGHT;
+	snake1.head = new Node;
+	snake1.head->X = WIDE / 4;
+	snake1.head->Y = HIGH / 2;
+	snake1.head->next = NULL;
+	snake1.head->last = NULL;
 
-	Node* p = snake2.head;
-	snake2.tail = snake2.head;
-	for (int i = 1;i < snake2.size;i++) {
+	Node* p = snake1.head;
+	snake1.tail = snake1.head;
+	for (int i = 1;i < snake1.size;i++) {
 		int term = rand() % MAX_IMAGE;
 		Node* newnode = new Node;
 		newnode->Y = HIGH / 2;
@@ -40,7 +40,7 @@ void InitSnake1() {
 		newnode->last = p;
 		p->next = newnode;
 		newnode->next = NULL;
-		snake2.tail = newnode;
+		snake1.tail = newnode;
 		p = p->next;
 	}
 }
@@ -72,10 +72,10 @@ void Updatemap() {
 			map[x][y] = 0;
 		}
 	}
-	for (Node* p = snake2.head; p != NULL; p = p->next) {
+	for (Node* p = snake1.head; p != NULL; p = p->next) {
 		map[p->X][p->Y] = 1;
 	}
-	for (Node* p = snake1.head;p != NULL;p = p->next) {
+	for (Node* p = snake2.head;p != NULL;p = p->next) {
 		map[p->X][p->Y] = 1;
 	}
 }
@@ -124,7 +124,7 @@ void DrawMap() {
 }
 
 void DrawSnake1() {
-	Node* p = snake2.head;
+	Node* p = snake1.head;
 	bool isHead = true;
 	while (p != NULL) {
 		int px = p->X*30;
@@ -150,9 +150,9 @@ void DrawFood() {
 
 void MoveSnake1() {
 	Node* p = new Node;
-	p->X = snake2.head->X;
-	p->Y = snake2.head->Y;
-	switch (snake2.dir) {
+	p->X = snake1.head->X;
+	p->Y = snake1.head->Y;
+	switch (snake1.dir) {
 	case VK_UP: p->Y--;
 		break;
 	case VK_DOWN: p->Y++;
@@ -162,10 +162,10 @@ void MoveSnake1() {
 	case VK_RIGHT: p->X++;
 		break;
 	}
-	p->next = snake2.head;
+	p->next = snake1.head;
 	p->last = NULL;
-	snake2.head->last = p;
-	snake2.head = p;
+	snake1.head->last = p;
+	snake1.head = p;
 	p = p->next;
 	while (p->next != NULL) {
 		p->image = p->next->image;
@@ -173,19 +173,19 @@ void MoveSnake1() {
 	}
 	int is = CheckEat1();
 	if (is) {
-		snake2.tail->image = rand() % MAX_IMAGE;
+		snake1.tail->image = rand() % MAX_IMAGE;
 	}
 	else {
-		snake2.tail = snake2.tail->last;
-		snake2.tail->next = NULL;
+		snake1.tail = snake1.tail->last;
+		snake1.tail->next = NULL;
 		map[p->X][p->Y] = 0;
 		delete p;
 	}
 }
 
 bool CheckEat1() {
-	int dx = snake2.head->X;
-	int dy = snake2.head->Y;
+	int dx = snake1.head->X;
+	int dy = snake1.head->Y;
 
 	int cell = map[dx][dy];
 	map[dx][dy] = 1;			// 新头占位
@@ -216,41 +216,41 @@ void gameover() {
 	outtextxy(WIDE * 15 - 150, HIGH * 15 - 30, _T("GAME OVER"));
 	FlushBatchDraw();
 	Sleep(3000);
-	Node* p = snake2.head;
+	Node* p = snake1.head;
 	while (p != NULL) {
 		Node* temp = p->next;
 		delete p;
 		p = temp;
 	}
-	snake2.head = NULL;
-	snake2.tail = NULL;
-	Node* q = snake1.head;
+	snake1.head = NULL;
+	snake1.tail = NULL;
+	Node* q = snake2.head;
 	while (q != NULL) {
 		Node* temp = q->next;
 		delete q;
 		q = temp;
 	}
-	snake1.head = NULL;
-	snake1.tail = NULL;
+	snake2.head = NULL;
+	snake2.tail = NULL;
 	exit(0);
 }
 void CheckCollision() {
-	if (snake2.head->X < 0 || snake2.head->X > WIDE - 1 || snake2.head->Y < 0 || snake2.head->Y > HIGH - 1) {
-		gameover();
-	}
 	if (snake1.head->X < 0 || snake1.head->X > WIDE - 1 || snake1.head->Y < 0 || snake1.head->Y > HIGH - 1) {
 		gameover();
 	}
-	Node* p = snake2.head->next;
+	if (snake2.head->X < 0 || snake2.head->X > WIDE - 1 || snake2.head->Y < 0 || snake2.head->Y > HIGH - 1) {
+		gameover();
+	}
+	Node* p = snake1.head->next;
 	while(p!=NULL) {
-		if (snake2.head->X == p->X && snake2.head->Y ==p->Y) {
+		if (snake1.head->X == p->X && snake1.head->Y ==p->Y) {
 			gameover();
 		}
 		p = p->next;
 	}
-	Node* q = snake1.head->next;
+	Node* q = snake2.head->next;
 	while (q != NULL) {
-		if (snake1.head->X == q->X && snake1.head->Y == q->Y) {
+		if (snake2.head->X == q->X && snake2.head->Y == q->Y) {
 			gameover();
 		}
 		q = q->next;
