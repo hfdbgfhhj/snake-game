@@ -1,18 +1,18 @@
 #include"snake.h"
 
 void InitImage() {
-	loadimage(&img_body1, _T("images/body1.png"), 30, 30);
+	loadimage(&img_body1[0], _T("images/body1.png"), 30, 30);
 	loadimage(&img_head1, _T("images/head1.png"), 30, 30);
 	loadimage(&img_food, _T("images/food.png"), 30, 30);
-	loadimage(&img_body2, _T("images/body2.png"), 30, 30);
+	loadimage(&img_body2[0], _T("images/body2.png"), 30, 30);
 	loadimage(&img_head2, _T("images/head2.png"), 30, 30);
 }
 
-IMAGE img_body1;
+IMAGE img_body1[MAX_IMAGE];
 IMAGE img_head1;
 IMAGE img_food;
 IMAGE img_head2;
-IMAGE img_body2;
+IMAGE img_body2[MAX_IMAGE];
 Snake snake2;
 Snake snake1;
 int score1;
@@ -23,7 +23,6 @@ Food foods[MAX_FOOD];
 void InitSnake1() {
 	snake2.size = 3;
 	snake2.dir = VK_RIGHT;
-
 	snake2.head = new Node;
 	snake2.head->X = WIDE / 4;
 	snake2.head->Y = HIGH / 2;
@@ -33,9 +32,11 @@ void InitSnake1() {
 	Node* p = snake2.head;
 	snake2.tail = snake2.head;
 	for (int i = 1;i < snake2.size;i++) {
+		int term = rand() % MAX_IMAGE;
 		Node* newnode = new Node;
 		newnode->Y = HIGH / 2;
 		newnode->X = WIDE / 4 - i;
+		newnode->image = term;
 		newnode->last = p;
 		p->next = newnode;
 		newnode->next = NULL;
@@ -45,7 +46,7 @@ void InitSnake1() {
 }
 
 // 随机取一个空格；地图上没有空格时返回 false
-static bool RandomEmptyCell(int* ox, int* oy) {
+bool RandomEmptyCell(int* ox, int* oy) {
 	static int ex[WIDE * HIGH], ey[WIDE * HIGH];
 	int count = 0;
 	for (int x = 0;x < WIDE;x++) {
@@ -133,7 +134,7 @@ void DrawSnake1() {
 			isHead = false;
 		}
 		else {
-			putimage(px, py, &img_body1);
+			putimage(px, py, &img_body1[p->image]);
 		}
 		p = p->next;
 	}
@@ -165,11 +166,24 @@ void MoveSnake1() {
 	p->last = NULL;
 	snake2.head->last = p;
 	snake2.head = p;
-	// 这里不再写 map：新头是不是食物交给 CheckEat 判断，
-	// 否则会把食物标记 2 覆盖成 1，永远吃不到东西
+	p = p->next;
+	while (p->next != NULL) {
+		p->image = p->next->image;
+		p = p->next;
+	}
+	int is = CheckEat1();
+	if (is) {
+		snake2.tail->image = rand() % MAX_IMAGE;
+	}
+	else {
+		snake2.tail = snake2.tail->last;
+		snake2.tail->next = NULL;
+		map[p->X][p->Y] = 0;
+		delete p;
+	}
 }
 
-void CheckEat() {
+bool CheckEat1() {
 	int dx = snake2.head->X;
 	int dy = snake2.head->Y;
 
@@ -178,7 +192,6 @@ void CheckEat() {
 
 	if (cell == 2) {			// 吃到食物：不删尾巴，蛇变长
 		score1 += 10;
-		//snake1.size++;
 		for (int i = 0;i < MAX_FOOD;i++) {
 			if (foods[i].X == dx && foods[i].Y == dy) {	// 只补充被吃掉的那一个
 				if (RandomEmptyCell(&foods[i].X, &foods[i].Y)) {
@@ -191,40 +204,10 @@ void CheckEat() {
 				break;
 			}
 		}
+		return true;
 	}
-	else {						// 没吃到：删尾巴
-		map[snake2.tail->X][snake2.tail->Y] = 0;
-			Node* p = snake2.tail;
-			snake2.tail = snake2.tail->last;
-			snake2.tail->next = NULL;
-			delete p;
-	}
-	dx = snake1.head->X;
-	dy = snake1.head->Y;
-	cell = map[dx][dy];
-	map[dx][dy] = 1;
-	if (cell == 2) {
-		score2 += 10;
-		for (int i = 0;i < MAX_FOOD;i++) {
-			if (dx == foods[i].X && dy == foods[i].Y) {
-				if (RandomEmptyCell(&foods[i].X, &foods[i].Y)) {
-					map[foods[i].X][foods[i].Y] = 2;
-				}
-				else {
-					foods[i].X = -1;
-					foods[i].Y = -1;
-				}
-				break;
-			}
-		}
-	}
-	else {
-		map[snake1.tail->X][snake1.tail->Y] = 0;
-		map[dx][dy] = 1;
-		Node* p = snake1.tail;
-		snake1.tail = snake1.tail->last;
-		snake1.tail->next = NULL;
-		delete p;
+	else {					
+		return false;
 	}
 }
 void gameover() {

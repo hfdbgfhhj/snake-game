@@ -12,16 +12,17 @@
 #include<graphics.h>
 #include<tchar.h>
 
-extern IMAGE img_body1;
-extern IMAGE img_head1;
-extern IMAGE img_head2;
-extern IMAGE img_body2;
-extern IMAGE img_food;
-
 #define WIDE 50
 #define HIGH 30
 
 #define MAX_FOOD 3
+#define MAX_IMAGE 1
+
+extern IMAGE img_body1[MAX_IMAGE];
+extern IMAGE img_head1;
+extern IMAGE img_head2;
+extern IMAGE img_body2[MAX_IMAGE];
+extern IMAGE img_food;
 
 //食物位置
 typedef struct {
@@ -34,6 +35,7 @@ typedef struct {
 typedef struct SnakeNode {
 	int X;
 	int Y;
+	int image;
 	struct SnakeNode* next;
 	struct SnakeNode* last;
 }Node;
@@ -51,6 +53,7 @@ void InitSnake1();//蛇初始化
 void InitSnake2();
 void InitFood();//食物初始化
 void InitImage();//图片初始化
+bool RandomEmptyCell(int* x, int* y);
 //渲染
 void DrawSnake1();//画蛇
 void DrawSnake2();
@@ -59,7 +62,8 @@ void DrawMap();//画地图
 //逻辑运行
 void MoveSnake1();
 void MoveSnake2();
-void CheckEat();
+bool CheckEat1();
+bool CheckEat2();
 void CheckCollision();//检查撞墙，撞自己
 void gameover();
 

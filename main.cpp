@@ -35,7 +35,6 @@ int main() {
 		}
 		MoveSnake1();
 		MoveSnake2();
-		CheckEat();
 		CheckCollision();
 		DrawMap();
 		DrawFood();
